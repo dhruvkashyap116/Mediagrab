@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>MediaGrab — Download Videos, Audio & Images</title>
+    <meta name="description" content="Paste a link, pick your format, download instantly. Videos up to 4K, audio at 320kbps, images at full resolution.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Lenis Smooth Scrolling -->
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+</head>
+<body>
+    <div class="app" id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg class="logo-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span class="logo-text">MediaGrab</span>
+            </div>
+            <div class="header-right">
+                <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <h1>Paste a link.<br><span class="hero-dim">Get your file.</span></h1>
+        </section>
+
+        <!-- Input -->
+        <div class="input-area" id="inputArea">
+            <div class="input-box" id="inputBox">
+                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <input type="url" id="urlInput" placeholder="Paste any URL here…" autocomplete="off" spellcheck="false" autofocus>
+                <button class="btn-x" id="btnClear" title="Clear" aria-label="Clear input">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <div class="input-loader" id="inputLoader"></div>
+            </div>
+        </div>
+
+        <!-- Preview Card (appears automatically) -->
+        <div class="preview" id="preview">
+            <div class="preview-card">
+                <img class="preview-thumb" id="previewThumb" src="" alt="">
+                <div class="preview-body">
+                    <h3 class="preview-title" id="previewTitle"></h3>
+                    <div class="preview-meta">
+                        <span id="previewUploader"></span>
+                        <span id="previewDuration"></span>
+                        <span id="previewViews"></span>
+                    </div>
+                    <div class="preview-badges" id="previewBadges"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Options (visible after preview loads) -->
+        <div class="options" id="options">
+            <!-- Format toggle -->
+            <div class="format-toggle" id="formatToggle">
+                <button class="fmt-btn active" data-format="video" id="fmtVideo">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Video
+                </button>
+                <button class="fmt-btn" data-format="audio" id="fmtAudio">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    Audio
+                </button>
+            </div>
+
+            <div class="opts-row">
+                <!-- Quality -->
+                <div class="opt-group" id="qualityGroup">
+                    <label>Quality</label>
+                    <select id="qualitySelect">
+                        <option value="best" selected>Best available</option>
+                        <option value="4k60">4K 60fps</option>
+                        <option value="4k">4K</option>
+                        <option value="1440p">1440p</option>
+                        <option value="1080p">1080p</option>
+                        <option value="720p">720p</option>
+                    </select>
+                </div>
+
+                <!-- Aspect Ratio -->
+                <div class="opt-group" id="ratioGroup">
+                    <label>Aspect</label>
+                    <select id="ratioSelect">
+                        <option value="original" selected>Original</option>
+                        <option value="16:9">Landscape (16:9)</option>
+                        <option value="9:16">Reel / Story (9:16)</option>
+                        <option value="1:1">Square (1:1)</option>
+                    </select>
+                </div>
+
+                <!-- Audio format (hidden by default) -->
+                <div class="opt-group hidden" id="audioGroup">
+                    <label>Format</label>
+                    <select id="audioFormatSelect">
+                        <option value="mp3" selected>MP3 320kbps</option>
+                        <option value="flac">FLAC</option>
+                        <option value="wav">WAV</option>
+                        <option value="aac">AAC</option>
+                        <option value="m4a">M4A</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Download button -->
+            <button class="btn-download" id="btnDownload">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download
+            </button>
+        </div>
+
+        <!-- Status banner -->
+        <div class="status-bar" id="statusBar"></div>
+
+        <!-- Downloads -->
+        <section class="downloads" id="downloadsSection">
+            <div class="dl-header">
+                <h2 class="section-label" id="downloadsLabel">Downloads</h2>
+                <button id="btnClearHistory" class="btn-clear-history">Clear History</button>
+            </div>
+            <div class="dl-list" id="dlList">
+                <div class="empty" id="emptyState">
+                    <p>No downloads yet</p>
+                    <span>Paste a URL above to get started</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Supported Sites -->
+        <section class="supported-sites">
+            <h2 class="section-label">Supported Sites</h2>
+            <div class="sites-grid">
+                <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.376.55 9.376.55s7.505 0 9.377-.55a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 2.23-1.15 4.39-2.98 5.74-1.85 1.39-4.25 1.76-6.49 1.25-2.26-.5-4.22-1.92-5.32-3.95-1.1-2.02-1.24-4.52-.39-6.66.86-2.13 2.58-3.8 4.7-4.51 2.05-.69 4.38-.6 6.34.34v4.21c-.81-.43-1.78-.6-2.69-.47-1.12.16-2.14.88-2.66 1.88-.51.98-.53 2.2-.06 3.19.46.97 1.34 1.72 2.39 1.95 1.16.27 2.45-.06 3.28-.9.7-.72 1.1-1.77 1.12-2.79.03-4.56.02-9.12.02-13.68-.02-1.42 0-2.84-.01-4.26z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="faq-section" id="faq">
+            <h2 class="section-label">Frequently Asked Questions</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-q">
+                        Is this service completely free?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="faq-a">Yes, MediaGrab is 100% free to use. There are no hidden fees, subscriptions, or download limits.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">
+                        What websites are supported?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="faq-a">We support downloading from YouTube, Twitter/X, Instagram, TikTok, Reddit, Facebook, Vimeo, and over 1000 other websites.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">
+                        How long are downloaded files kept?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="faq-a">For privacy and storage reasons, all downloaded files are automatically deleted from our servers 10 minutes after the download completes. Make sure to save your file locally!</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">
+                        Why did my YouTube video fail to download?
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="faq-a">If a video is age-restricted, members-only, or private, you will need to upload a cookies.txt file using the banner to authenticate your request.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="ad-space">
+                <!-- Ad script goes here -->
+                <span>Advertisement</span>
+            </div>
+            <p>&copy; 2026 MediaGrab. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#" id="linkPrivacy">Privacy Policy</a>
+                <a href="#" id="linkTerms">Terms of Service</a>
+                <a href="mailto:dk321687@gmail.com">Help & Contact</a>
+                <a href="https://www.linkedin.com/in/dhruv-kashyap-894126276/" target="_blank">LinkedIn</a>
+                <a href="https://github.com/dhruvkashyap116" target="_blank">GitHub</a>
+            </div>
+            <div class="creator-credit">
+                <p>Made with ❤️ by <a href="#" target="_blank">Dhruv Kashyap</a></p>
+                <p class="support-text">Support future products & research via UPI: <br> <strong>dk321687@okicici</strong></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Hidden elements -->
+    <input type="file" id="cookieFileInput" accept=".txt" style="display:none">
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="privacyModal">
+            <button class="modal-close">&times;</button>
+            <h2>Privacy Policy</h2>
+            <div class="modal-content">
+                <p><strong>Your Data is Safe and Secure</strong></p>
+                <p>Welcome to MediaGrab. Your privacy is critically important to us.</p>
+                <p><strong>1. Data Collection:</strong> We do not collect or store any personal data. The URLs you paste are processed purely to fetch media content and are not associated with any personal identifier.</p>
+                <p><strong>2. File Storage:</strong> Any file you download is temporarily processed on our servers and automatically deleted 10 minutes after generation for security and privacy reasons. We retain NO copies of your files.</p>
+                <p><strong>3. Local History:</strong> Your download history is stored entirely locally on your browser using <code>localStorage</code>. It is completely private to you. Items are automatically removed after 30 minutes, or you can clear them manually.</p>
+                <p><strong>4. Third-Party Services:</strong> We use standard libraries like yt-dlp to process media, which interacts with third-party platforms on your behalf. We do not track your behavior across these platforms.</p>
+            </div>
+        </div>
+        <div class="modal" id="termsModal">
+            <button class="modal-close">&times;</button>
+            <h2>Terms of Service</h2>
+            <div class="modal-content">
+                <p><strong>1. Usage:</strong> MediaGrab is provided as a free utility. You agree to use this service only for lawful purposes and in compliance with the copyright policies of the platforms you download from.</p>
+                <p><strong>2. Fair Use:</strong> Please do not abuse the service. We implement rate limiting to ensure fair access for all users. Bypassing these limits is prohibited.</p>
+                <p><strong>3. Disclaimer:</strong> This service is provided "as is", without any warranties. The creator is not liable for any issues arising from the use of this tool.</p>
+                <p><strong>4. Help & Support:</strong> For customer support or inquiries, please contact us directly.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-text">MediaGrab</span>
+            <button class="sidebar-close" id="sidebarClose">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <nav class="sidebar-nav">
+                <a href="#" class="sidebar-link" onclick="document.getElementById('sidebarClose').click()">Home</a>
+                <a href="#faq" class="sidebar-link" onclick="document.getElementById('sidebarClose').click()">FAQ</a>
+                <a href="#" class="sidebar-link" id="linkPrivacySidebar">Privacy Policy</a>
+                <a href="#" class="sidebar-link" id="linkTermsSidebar">Terms of Service</a>
+            </nav>
+            <div class="sidebar-contact">
+                <h3>Contact</h3>
+                <a href="mailto:dk321687@gmail.com">dk321687@gmail.com</a>
+                <a href="https://www.linkedin.com/in/dhruv-kashyap-894126276/" target="_blank">LinkedIn</a>
+                <a href="https://github.com/dhruvkashyap116" target="_blank">GitHub</a>
+            </div>
+            <div class="sidebar-footer">
+                <button class="theme-toggle" id="themeToggleSidebar" aria-label="Toggle dark mode">
+                    <!-- Moon icon for light mode -->
+                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <!-- Sun icon for dark mode -->
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    Toggle Theme
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function Discount(price, discount) {
+            this.price = price;
+            this.discount = discount;
+        }
+        Discount.prototype.and = function () {
+            return this.price - (this.price * this.discount /100);
+        };
+        const calc = new Discount(100, 20);
+        console.log('price:', calc.price, 'discount:', calc.discount);
+        console.log('price after discount:', calc.and());
+    </script>
+</body>
+
+</html>

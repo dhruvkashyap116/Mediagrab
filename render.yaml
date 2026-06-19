@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: mediagrab
+    runtime: docker
+    plan: free
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: FLASK_DEBUG
+        value: "0"
